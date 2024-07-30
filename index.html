@@ -47,27 +47,15 @@
 
     function downloadPdf() {
       statusMessage.textContent = 'Checking file status...';
-      fetch('https://niftyindices.com/Factsheet/ind_nifty50.pdf', {
-        method: 'HEAD',
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
-        }
-      })
+      fetch('https://niftyindices.com/Factsheet/ind_nifty50.pdf')
       .then(response => {
-        if (response.ok && response.status === 200) {
-          statusMessage.textContent = '';
-          return fetch('https://niftyindices.com/Factsheet/ind_nifty50.pdf', {
-            method: 'GET',
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
-            }
-          });
+        if (response.ok) {
+          return response.blob();
         } else {
           statusMessage.textContent = 'Failed to retrieve PDF.';
-          console.error('Failed to retrieve PDF:', response.status);
+          return Promise.reject('Failed to retrieve PDF');
         }
       })
-      .then(response => response.blob())
       .then(blob => {
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
@@ -79,10 +67,10 @@
         svg.innerHTML = '<circle cx="20" cy="20" r="20" fill="green" />';
         svgContainer.appendChild(svg);
         svgContainer.style.display = 'block';
+        statusMessage.textContent = 'PDF downloaded successfully!';
       })
       .catch(error => {
         statusMessage.textContent = 'Error occurred.';
-        console.error('Error:', error);
       });
     }
   </script>
